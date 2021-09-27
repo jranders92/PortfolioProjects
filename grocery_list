@@ -1,0 +1,83 @@
+# My Grocery List by Joseph Anderson. A program I wrote that demonstrates 
+# Python fundamentals. Includes use of the following: variables, lists, 
+# list manipulation, list comprehension, dictionaries, functions, 
+# exception handling, if and while loops, working with modules, 
+# formatting, and user input. Currently working on writing the grocery list 
+# to a spreadsheet so the user can gather data on what they have been 
+# putting on their list.
+
+from operator import itemgetter
+import pyinputplus as pyip
+
+list = []
+list_dict = {}
+
+print("Welcome to My Grocery List!\nCreate and track your grocery list using this program!\n")
+
+while True:
+    menu = pyip.inputMenu(['Add', 'Remove', 'View', 'Done'])
+    # functions for Add, Remove, View, and Done
+    if menu == 'Add':
+        flag = True
+        while flag:
+            item = pyip.inputStr("\nEnter your grocery list item here. Enter 'q' to quit:  ")
+            if item == 'q':
+                flag = False
+                break
+            qty = pyip.inputNum("How many?  ")
+            #Duplicate item handling. Warns user of duplicate entry
+            for i in range(len(list)):
+                if list[i]['item'] == item:
+                    item = (f"{item}(duplicate)")
+                    print("Duplicate entry. Please view list")
+            list_dict['item'] = item
+            list_dict['qty'] = qty
+            list.append(list_dict.copy())
+    if menu == 'Done':
+        # Views list, writes to spreadsheet(coming soon!), deletes list, 
+        # and exits program.
+        try:
+            ViewList()
+            print("Happy shopping! Your list has been recorded.\n")
+            # write to speadsheet(coming soon)
+            del list
+            break
+        except:
+            if list == []:
+                print("\nThanks for using My Grocery List!")
+                break
+    if menu == 'View':
+        try:
+            ViewList()
+        except NameError:
+            print("\nPlease create a grocery list.\n")
+        except TypeError:
+            print("\nPlease create a grocery list.\n")
+    if menu == 'Remove':
+        try:
+            ViewList()
+            print("\n")
+            DeleteItem()
+        except:
+            if list == []:
+                print("\nPlease create a grocery list.\n")
+    # for testing
+    # print(list)
+
+    def ViewList():
+        """view list and totals quantity"""
+        list.sort(key=itemgetter('item'))
+        quantity = [a_dict['qty'] for a_dict in list]
+        count = sum(quantity)
+        print(f"\nYou have {count} item(s) on your grocery list:\n")
+        for a_dict in list:
+            print(f"{a_dict['item'].title()} x{a_dict['qty']}")
+        print("\n")
+    
+    def DeleteItem():
+        """deletes item and quantity from list"""
+        choice = pyip.inputChoice([a_dict['item'] for a_dict in list], blank=True)
+        for i in range(len(list)):
+            if list[i]['item'] == choice:
+                del list[i]
+                break
